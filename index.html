@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Inteligente de Compra</title>
+    <!-- Adicionando Tailwind CSS para deixar o visual bonito automaticamente -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <div class="max-w-md mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">Descubra a Melhor Estratégia de Compra</h1>
+        
+        <!-- Formulário de Entrada -->
+        <div id="formulario">
+            <label class="block mb-2 font-semibold">Qual o valor do bem? (R$)</label>
+            <input type="number" id="valorBem" class="w-full p-3 border rounded mb-4" value="100000">
+
+            <label class="block mb-2 font-semibold">Valor da Entrada (R$)</label>
+            <input type="number" id="valorEntrada" class="w-full p-3 border rounded mb-4" value="30000">
+
+            <label class="block mb-2 font-semibold">Prazo desejado (Meses)</label>
+            <input type="number" id="prazo" class="w-full p-3 border rounded mb-6" value="60">
+
+            <button onclick="calcularSimulacao()" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded hover:bg-blue-700 transition">
+                Simular Agora
+            </button>
+        </div>
+
+        <!-- Resultados (Escondido inicialmente) -->
+        <div id="resultado" class="hidden mt-8">
+            <h2 class="text-xl font-bold text-center mb-4">Veja a diferença:</h2>
+            
+            <div class="flex justify-between items-end h-40 mb-4">
+                <!-- Barra Financiamento -->
+                <div class="w-5/12 bg-red-500 rounded-t flex flex-col justify-end items-center text-white pb-2" style="height: 100%;" id="barraFinanciamento">
+                    <span class="text-xs">Financiamento</span>
+                    <span class="font-bold text-sm" id="textoTotalFinan"></span>
+                </div>
+                <!-- Barra Consórcio (Será calculada em % em relação ao financiamento) -->
+                <div class="w-5/12 bg-green-500 rounded-t flex flex-col justify-end items-center text-white pb-2" id="barraConsorcio">
+                    <span class="text-xs">Consórcio + Invest.</span>
+                    <span class="font-bold text-sm" id="textoTotalConsorcio"></span>
+                </div>
+            </div>
+
+            <p class="text-center font-bold text-green-600 text-lg mb-6" id="textoEconomia"></p>
+
+            <!-- Gatilho para capturar Lead -->
+            <div class="bg-yellow-100 p-4 rounded border border-yellow-300 text-center">
+                <h3 class="font-bold text-yellow-800 mb-2">Quer o relatório detalhado dessa estratégia?</h3>
+                <p class="text-sm mb-4">Veja como usar a sua entrada para abater o prazo e lucrar com os juros.</p>
+                <input type="text" placeholder="Seu Nome" class="w-full p-2 border rounded mb-2 text-sm">
+                <input type="tel" placeholder="Seu WhatsApp" class="w-full p-2 border rounded mb-3 text-sm">
+                <button class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 text-sm">
+                    Liberar Estratégia Completa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- O Motor Matemático -->
+    <script>
+        function calcularSimulacao() {
+            const valorBem = Number(document.getElementById('valorBem').value);
+            const entrada = Number(document.getElementById('valorEntrada').value);
+            const prazo = Number(document.getElementById('prazo').value);
+
+            // Variáveis fixas para simulação (Podem ser ajustadas depois)
+            const taxaJurosFinanAno = 18.0; 
+            const taxaAdmConsorcio = 17.0; 
+            const rendimentoEntradaAno = 10.5;
+
+            // Cálculos Consórcio
+            const custoTotalConsorcio = valorBem * (1 + (taxaAdmConsorcio / 100));
+            
+            // Cálculos Financiamento (Aproximação Price)
+            const saldoDevedor = valorBem - entrada;
+            const taxaMensalFinan = (Math.pow(1 + taxaJurosFinanAno / 100, 1 / 12) - 1);
+            const fatorPrice = (taxaMensalFinan * Math.pow(1 + taxaMensalFinan, prazo)) / (Math.pow(1 + taxaMensalFinan, prazo) - 1);
+            const custoTotalFinanciamento = (saldoDevedor * fatorPrice * prazo) + entrada;
+
+            // Cálculos Investimento da Entrada
+            const taxaMensalRendimento = (Math.pow(1 + rendimentoEntradaAno / 100, 1 / 12) - 1);
+            const montanteInvestimento = entrada * Math.pow(1 + taxaMensalRendimento, prazo);
+            const lucroInvestimento = montanteInvestimento - entrada;
+
+            const custoRealConsorcio = custoTotalConsorcio - lucroInvestimento;
+            const economia = custoTotalFinanciamento - custoRealConsorcio;
+
+            // Atualizando a tela
+            document.getElementById('formulario').classList.add('hidden');
+            document.getElementById('resultado').classList.remove('hidden');
+
+            // Formatando para Moeda Brasileira
+            const formatarMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.getElementById('textoTotalFinan').innerText = formatarMoeda(custoTotalFinanciamento);
+            document.getElementById('textoTotalConsorcio').innerText = formatarMoeda(custoRealConsorcio);
+            document.getElementById('textoEconomia').innerText = `Você economiza ${formatarMoeda(economia)}!`;
+
+            // Ajustando a altura da barra verde proporcionalmente
+            const alturaProporcional = (custoRealConsorcio / custoTotalFinanciamento) * 100;
+            document.getElementById('barraConsorcio').style.height = `${alturaProporcional}%`;
+        }
+    </script>
+</body>
+</html>
