@@ -4,105 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador Inteligente de Compra</title>
-    <!-- Adicionando Tailwind CSS para deixar o visual bonito automaticamente -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800">
+<body class="bg-gray-100 font-sans text-gray-800 pb-10">
 
     <div class="max-w-md mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
-        <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">Descubra a Melhor Estratégia de Compra</h1>
+        <h1 class="text-2xl font-bold text-center text-blue-700 mb-6">Simulador Inteligente de Compra</h1>
         
         <!-- Formulário de Entrada -->
         <div id="formulario">
             <label class="block mb-2 font-semibold">Qual o valor do bem? (R$)</label>
-            <input type="number" id="valorBem" class="w-full p-3 border rounded mb-4" value="100000">
+            <input type="number" id="valorBem" class="w-full p-3 border rounded mb-4 focus:ring-2 focus:ring-blue-500 outline-none" value="100000">
 
             <label class="block mb-2 font-semibold">Valor da Entrada (R$)</label>
-            <input type="number" id="valorEntrada" class="w-full p-3 border rounded mb-4" value="30000">
+            <input type="number" id="valorEntrada" class="w-full p-3 border rounded mb-4 focus:ring-2 focus:ring-blue-500 outline-none" value="30000">
 
-            <label class="block mb-2 font-semibold">Prazo desejado (Meses)</label>
-            <input type="number" id="prazo" class="w-full p-3 border rounded mb-6" value="60">
+            <label class="block mb-2 font-semibold text-sm text-gray-600">Simule investir essa entrada ao invés de dar para o banco.</label>
 
-            <button onclick="calcularSimulacao()" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded hover:bg-blue-700 transition">
-                Simular Agora
+            <label class="block mb-2 mt-4 font-semibold">Prazo desejado (Meses)</label>
+            <input type="number" id="prazo" class="w-full p-3 border rounded mb-6 focus:ring-2 focus:ring-blue-500 outline-none" value="60">
+
+            <button onclick="calcularSimulacao()" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded hover:bg-blue-700 transition shadow-lg">
+                Fazer Cálculo Completo
             </button>
         </div>
 
-        <!-- Resultados (Escondido inicialmente) -->
-        <div id="resultado" class="hidden mt-8">
-            <h2 class="text-xl font-bold text-center mb-4">Veja a diferença:</h2>
+        <!-- Resultados -->
+        <div id="resultado" class="hidden mt-4">
+            <button onclick="voltar()" class="text-sm text-blue-600 underline mb-4 hover:text-blue-800">&larr; Refazer Simulação</button>
             
-            <div class="flex justify-between items-end h-40 mb-4">
+            <h2 class="text-xl font-bold text-center mb-6">Comparativo de Custos</h2>
+            
+            <!-- Gráfico de Barras -->
+            <div class="flex justify-between items-end h-40 mb-4 border-b-2 border-gray-200 pb-1">
                 <!-- Barra Financiamento -->
-                <div class="w-5/12 bg-red-500 rounded-t flex flex-col justify-end items-center text-white pb-2" style="height: 100%;" id="barraFinanciamento">
-                    <span class="text-xs">Financiamento</span>
-                    <span class="font-bold text-sm" id="textoTotalFinan"></span>
+                <div class="w-5/12 bg-red-500 rounded-t flex flex-col justify-end items-center text-white pb-2 transition-all duration-1000" style="height: 100%;" id="barraFinanciamento">
+                    <span class="text-xs font-semibold px-1 text-center">Financiamento</span>
+                    <span class="font-bold text-sm mt-1" id="textoTotalFinan"></span>
                 </div>
-                <!-- Barra Consórcio (Será calculada em % em relação ao financiamento) -->
-                <div class="w-5/12 bg-green-500 rounded-t flex flex-col justify-end items-center text-white pb-2" id="barraConsorcio">
-                    <span class="text-xs">Consórcio + Invest.</span>
-                    <span class="font-bold text-sm" id="textoTotalConsorcio"></span>
+                <!-- Barra Consórcio -->
+                <div class="w-5/12 bg-green-500 rounded-t flex flex-col justify-end items-center text-white pb-2 transition-all duration-1000" id="barraConsorcio">
+                    <span class="text-xs font-semibold px-1 text-center">Consórcio + Invest.</span>
+                    <span class="font-bold text-sm mt-1" id="textoTotalConsorcio"></span>
                 </div>
             </div>
 
-            <p class="text-center font-bold text-green-600 text-lg mb-6" id="textoEconomia"></p>
+            <p class="text-center font-bold text-green-600 text-xl mb-6 bg-green-50 p-2 rounded border border-green-200" id="textoEconomia"></p>
 
-            <!-- Gatilho para capturar Lead -->
-            <div class="bg-yellow-100 p-4 rounded border border-yellow-300 text-center">
-                <h3 class="font-bold text-yellow-800 mb-2">Quer o relatório detalhado dessa estratégia?</h3>
-                <p class="text-sm mb-4">Veja como usar a sua entrada para abater o prazo e lucrar com os juros.</p>
-                <input type="text" placeholder="Seu Nome" class="w-full p-2 border rounded mb-2 text-sm">
-                <input type="tel" placeholder="Seu WhatsApp" class="w-full p-2 border rounded mb-3 text-sm">
-                <button class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 text-sm">
-                    Liberar Estratégia Completa
-                </button>
+            <!-- Relatório Detalhado Liberado -->
+            <div class="bg-blue-50 p-5 rounded border border-blue-200">
+                <h3 class="font-bold text-blue-800 mb-4 text-center">O Segredo da Estratégia</h3>
+                <p class="text-sm text-gray-700 mb-4">Ao invés de dar a sua entrada para o banco, simulamos você <strong>investindo</strong> esse valor em Renda Fixa durante o período do plano.</p>
+                
+                <ul class="text-sm space-y-3 text-gray-800">
+                    <li class="flex justify-between border-b border-blue-100 pb-1">
+                        <span>Valor Investido (Entrada):</span> <strong id="detEntrada"></strong>
+                    </li>
+                    <li class="flex justify-between border-b border-blue-100 pb-1">
+                        <span>Rendimento Bruto (Juros ganhos):</span> <strong class="text-green-600" id="detLucro"></strong>
+                    </li>
+                    <li class="flex justify-between border-b border-blue-100 pb-1">
+                        <span>Custo Bruto do Consórcio:</span> <strong id="detCustoConsorcio"></strong>
+                    </li>
+                    <li class="flex justify-between pt-1">
+                        <span>Custo Real (Abatendo os juros ganhos):</span> <strong class="text-blue-700 text-base" id="detCustoReal"></strong>
+                    </li>
+                </ul>
             </div>
+            
+            <a href="https://wa.me/5511999999999?text=Olá!%20Fiz%20uma%20simulação%20no%20site%20e%20quero%20dar%20andamento." target="_blank" class="block w-full text-center mt-6 bg-green-600 text-white font-bold py-3 px-4 rounded hover:bg-green-700 transition shadow-lg">
+                Falar com um Consultor
+            </a>
         </div>
     </div>
 
-    <!-- O Motor Matemático -->
+    <!-- Motor Matemático -->
     <script>
+        const formatarMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
         function calcularSimulacao() {
             const valorBem = Number(document.getElementById('valorBem').value);
             const entrada = Number(document.getElementById('valorEntrada').value);
             const prazo = Number(document.getElementById('prazo').value);
 
-            // Variáveis fixas para simulação (Podem ser ajustadas depois)
+            // Taxas base
             const taxaJurosFinanAno = 18.0; 
             const taxaAdmConsorcio = 17.0; 
             const rendimentoEntradaAno = 10.5;
 
-            // Cálculos Consórcio
+            // 1. Cálculos Consórcio
             const custoTotalConsorcio = valorBem * (1 + (taxaAdmConsorcio / 100));
             
-            // Cálculos Financiamento (Aproximação Price)
+            // 2. Cálculos Financiamento (Price aproximada)
             const saldoDevedor = valorBem - entrada;
             const taxaMensalFinan = (Math.pow(1 + taxaJurosFinanAno / 100, 1 / 12) - 1);
             const fatorPrice = (taxaMensalFinan * Math.pow(1 + taxaMensalFinan, prazo)) / (Math.pow(1 + taxaMensalFinan, prazo) - 1);
             const custoTotalFinanciamento = (saldoDevedor * fatorPrice * prazo) + entrada;
 
-            // Cálculos Investimento da Entrada
+            // 3. Cálculos Investimento
             const taxaMensalRendimento = (Math.pow(1 + rendimentoEntradaAno / 100, 1 / 12) - 1);
             const montanteInvestimento = entrada * Math.pow(1 + taxaMensalRendimento, prazo);
             const lucroInvestimento = montanteInvestimento - entrada;
 
+            // 4. O Custo Real
             const custoRealConsorcio = custoTotalConsorcio - lucroInvestimento;
             const economia = custoTotalFinanciamento - custoRealConsorcio;
 
-            // Atualizando a tela
+            // Transição de tela
             document.getElementById('formulario').classList.add('hidden');
             document.getElementById('resultado').classList.remove('hidden');
 
-            // Formatando para Moeda Brasileira
-            const formatarMoeda = (valor) => valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
+            // Preenchendo Gráficos principais
             document.getElementById('textoTotalFinan').innerText = formatarMoeda(custoTotalFinanciamento);
             document.getElementById('textoTotalConsorcio').innerText = formatarMoeda(custoRealConsorcio);
             document.getElementById('textoEconomia').innerText = `Você economiza ${formatarMoeda(economia)}!`;
 
-            // Ajustando a altura da barra verde proporcionalmente
-            const alturaProporcional = (custoRealConsorcio / custoTotalFinanciamento) * 100;
-            document.getElementById('barraConsorcio').style.height = `${alturaProporcional}%`;
+            // Preenchendo Relatório Detalhado
+            document.getElementById('detEntrada').innerText = formatarMoeda(entrada);
+            document.getElementById('detLucro').innerText = `+ ${formatarMoeda(lucroInvestimento)}`;
+            document.getElementById('detCustoConsorcio').innerText = formatarMoeda(custoTotalConsorcio);
+            document.getElementById('detCustoReal').innerText = formatarMoeda(custoRealConsorcio);
+
+            // Altura do gráfico
+            setTimeout(() => {
+                const alturaProporcional = (custoRealConsorcio / custoTotalFinanciamento) * 100;
+                document.getElementById('barraConsorcio').style.height = `${alturaProporcional}%`;
+            }, 100);
+        }
+
+        function voltar() {
+            document.getElementById('formulario').classList.remove('hidden');
+            document.getElementById('resultado').classList.add('hidden');
+            document.getElementById('barraConsorcio').style.height = '0%';
         }
     </script>
 </body>
